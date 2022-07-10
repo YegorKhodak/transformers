@@ -51,6 +51,7 @@ from ...utils import (
     replace_return_docstrings,
 )
 from .configuration_bert import BertConfig
+from .modeling_kd import KDCache
 
 
 logger = logging.get_logger(__name__)
@@ -244,7 +245,7 @@ class BertEmbeddings(nn.Module):
         return embeddings
 
 
-class BertSelfAttention(nn.Module):
+class BertSelfAttention(nn.Module, KDCache):
     def __init__(self, config, position_embedding_type=None):
         super().__init__()
         if config.hidden_size % config.num_attention_heads != 0 and not hasattr(config, "embedding_size"):
@@ -346,6 +347,8 @@ class BertSelfAttention(nn.Module):
         if attention_mask is not None:
             # Apply the attention mask is (precomputed for all layers in BertModel forward() function)
             attention_scores = attention_scores + attention_mask
+
+        self.remember(attention_scores)
 
         # Normalize the attention scores to probabilities.
         attention_probs = nn.functional.softmax(attention_scores, dim=-1)
