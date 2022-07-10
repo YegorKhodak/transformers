@@ -245,9 +245,10 @@ class BertEmbeddings(nn.Module):
         return embeddings
 
 
-class BertSelfAttention(KDCache, nn.Module):
+class BertSelfAttention(nn.Module, KDCache):
     def __init__(self, config, position_embedding_type=None):
         super().__init__()
+        KDCache.__init__(self)
         if config.hidden_size % config.num_attention_heads != 0 and not hasattr(config, "embedding_size"):
             raise ValueError(
                 f"The hidden size ({config.hidden_size}) is not a multiple of the number of attention "
